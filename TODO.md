@@ -7,5 +7,5 @@
       monsters appearing behind their shoulder, then a jump scare. The feed stays in the page: never recorded or
       uploaded, and the camera turns off right after (the camera light goes off). Works on Pages (https).
 - [ ] **Screams**: Kimmie makes the horror screams and drops them in `audio/screams/` (mp3/ogg/wav).
-      Then: each scare plays a random scream with the monster (the synth sting stays as the fallback), and
+      Then: each scare plays a random scream with the monster, and the distant screams in the room sounds use them too (the synth versions stay as the fallback), and
       they go quiet with the rest of the sound on Esc Esc.

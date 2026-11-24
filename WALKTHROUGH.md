@@ -61,8 +61,30 @@ SLEEP
 guest_000 finally rests, "moves into your history" (a few `#0` entries on your back button), and leaves.
 **play again** starts over; **forget me** wipes your name and progress from the browser.
 
+## On a phone
+Phones have no console, page source or tab titles, so guest_000 notices it's on a phone and changes the puzzles.
+The words are the same.
+
+| Word | On a phone |
+|------|------------|
+| **HOLLOW** | Lock the screen for a few seconds, unlock it, and watch: it flashes for a split second. |
+| **MARROW** | Turn the phone upside down. |
+| **ROOT** | Shake the phone. |
+| **HOME** | Press and hold the dark part of the screen for 3 seconds. |
+| **SKIN** | Pinch to zoom in. |
+| **LUNG** | Lay the phone face down for a few seconds, then turn it back over. |
+| **EYES** | Turn the phone sideways (rotation on). |
+| **ELBOW** | Press and hold: its own menu opens. |
+| **PULSE** | Tap in time with the red heartbeat, five times in a row. |
+
+On iPhone it asks to "feel you move" first (the motion permission). If you say no, pressing and holding for
+3 seconds gives you the tilt and shake words instead.
+
 ## Jump scares
 Only two: one at a random moment during the chat, and one at the very end. Everything else is a glitch.
+
+Every 20 to 60 seconds something happens elsewhere in the building: knocking, dripping, a pipe bursting, footsteps,
+a scream far away. Sometimes guest_000 mentions it.
 
 ## Things it does along the way
 - Counts how long you were away from the tab, and how many times you've visited.
