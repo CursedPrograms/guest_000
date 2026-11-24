@@ -602,8 +602,8 @@
   let hates = 0, names = 0;
   async function askedName() {
     names++;
-    if (names === 1) { await say('nobody.'); return say('i have been nobody for a long time.'); }
-    return say(pick(['nobody. i told you.', 'nobody is talking to you.', 'you keep asking. nobody keeps answering.']));
+    if (names === 1) { await say('i am nobody.'); return say('i have been nobody for a long time.'); }
+    return say(pick(['i am nobody. i told you.', 'i am nobody. nobody is talking to you.', 'you keep asking. i am nobody.']));
   }
   const COMMANDS = {
     WAKE: async () => {

@@ -62,7 +62,7 @@ guest_000 finally rests, "moves into your history" (a few `#0` entries on your b
 **play again** starts over; **forget me** wipes your name and progress from the browser.
 
 ### The secret ending
-Ask guest_000 its name at any time ("what is your name?" or "who are you?"). It says **nobody**.
+Ask guest_000 its name at any time ("what is your name?" or "who are you?"). It says **"i am nobody."**
 At the very end, type **NOBODY** instead of SLEEP. It is so happy you said its name that it doesn't leave the way
 it usually does: the last screen reads *"nobody has left your browser."* (Read that twice.)
 
