@@ -89,7 +89,7 @@ a scream far away. Sometimes guest_000 mentions it.
 ## Things it does along the way
 - Counts how long you were away from the tab, and how many times you've visited.
 - Notices when you go idle, head for the X, resize the window, leave fullscreen or press Back.
-- Adds a little signature to anything you copy, and won't let itself be printed.
+- Adds a little signature to anything you copy. Printing it (outside level 9) gets you only "you can't take me with you on paper."
 
 ## Stopping
 Press **Esc twice**, or click **esc esc** in the top corner, to pause at any time.
