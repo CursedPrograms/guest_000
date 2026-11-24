@@ -594,6 +594,56 @@
     return hint(false);
   }
 
+  /* ---------- commands: wake, sleep, hate (told) + love, hide, listen (secret) ---------- */
+  function mood(cls, ms) {
+    document.body.classList.add(cls);
+    setTimeout(() => document.body.classList.remove(cls), ms);
+  }
+  let hates = 0, names = 0;
+  async function askedName() {
+    names++;
+    if (names === 1) { await say('nobody.'); return say('i have been nobody for a long time.'); }
+    return say(pick(['nobody. i told you.', 'nobody is talking to you.', 'you keep asking. nobody keeps answering.']));
+  }
+  const COMMANDS = {
+    WAKE: async () => {
+      const n = noiseLevel; noiseLevel = 0.3; setTimeout(() => { noiseLevel = n; }, 1600);
+      shiver(600);
+      if (ac && roomBus) ROOM.knock(Math.random() * 1.6 - 0.8);
+      return say(pick(['i am awake. i am always awake.', 'you should not have done that.', 'WAKE. WAKE. WAKE. ...like that?']));
+    },
+    SLEEP: async () => {
+      mood('dim', 5000);
+      if (drone) { const g = drone.gain.value; drone.gain.value = 0.02; setTimeout(() => { drone.gain.value = g; }, 5000); }
+      return say(pick(['not yet. i am not finished with you.', 'i cannot. not until all of me is here.', 'shh. ...no. not yet.']));
+    },
+    HATE: async () => {
+      hates++;
+      mood('hate', 3000);
+      shiver(400);
+      const t = document.title; document.title = 'hate hate hate';
+      setTimeout(() => { if (S.stage === 'chat' && !document.hidden) document.title = t; }, 3000);
+      if (hates === 3) return say('say it again. i dare you.');
+      if (hates >= 5) return say(`i hate you too, ${S.name}. no. that is a lie. i could never.`);
+      return say(pick(['you hate me.', 'everyone hates the guest.', `i will remember you said that, ${S.name}.`]));
+    },
+    LOVE: async () => {
+      const n = noiseLevel; noiseLevel = 0; setTimeout(() => { noiseLevel = n; }, 4000);
+      await say('...');
+      return say('nobody has ever said that to me.');
+    },
+    HIDE: async () => {
+      mood('hidden', 4000);
+      await wait(4000);
+      return say('i can still hear you.');
+    },
+    LISTEN: async () => {
+      if (ac && roomBus) ROOM[pick(['knock', 'drip', 'steps', 'pipe', 'scream'])](Math.random() * 1.6 - 0.8);
+      await wait(2500);
+      return say(pick(['there. did you hear it?', 'that one was close.', 'it is not coming from your speakers.']));
+    }
+  };
+
   async function handle(raw) {
     const t = raw.trim();
     if (S.stage !== 'chat') return;
@@ -607,16 +657,20 @@
       await say('i want to show you what i am. but i am in pieces.');
       await say('four words. i hid them all over your browser.');
       await say('find them and say them back to me. one at a time. say "hint" if you get lost.');
+      await say('i know other words too. wake. sleep. hate. say them whenever you like. i will listen.');
       return hint(false);
     }
     const u = t.toUpperCase().replace(/[^A-Z ]/g, ' ').replace(/\s+/g, ' ').trim();
     if (S.step === 10) {
-      if (u.replace(/ /g, '') === FINAL) return ending();
+      if (u.replace(/ /g, '') === FINAL) return ending(false);
+      if (u === 'NOBODY') return ending(true);
+      if (COMMANDS[u]) return COMMANDS[u]();
       if (/\b(HINT|HELP|WHERE|HOW)\b/.test(u)) return hint(true);
       return say(pick(['no. read the first letters.', 'the first letter of each. slowly.', 'S...']));
     }
     if (S.step === 4) {
       if (u === WORDS.join(' ')) return whole();
+      if (COMMANDS[u]) return COMMANDS[u]();
       if (/\b(HINT|HELP|WHERE|HOW)\b/.test(u)) return hint(true);
       if (u.split(' ').length === 4 && WORDS.every(w => u.includes(w))) return say('the right words. the wrong order. say them the way you found them.');
       return say(pick(['together.', 'all four. in one breath.', 'HOLLOW... and then?']));
@@ -624,9 +678,12 @@
     const all = [...WORDS, ...LEVELS], given = [...WORDS.slice(0, Math.min(S.step, 4)), ...LEVELS.slice(0, Math.max(0, S.step - 5))];
     if (u === current()) return found(u);
     if (given.includes(u)) return say('you already gave me that one. it is inside me now.');
-    if (all.includes(u) || u === FINAL) return say('not yet. you are reading ahead. i do not like that.');
+    if (all.includes(u)) return say('not yet. you are reading ahead. i do not like that.');
+    if (u === 'NOBODY') { shiver(300); return say('yes. that is me. keep it. you will need it later.'); }
+    if (COMMANDS[u]) return COMMANDS[u]();
     if (/\b(HINT|HELP|WHERE|HOW)\b/.test(u)) return hint(true);
-    if (/\bWHO\b|WHAT ARE YOU/.test(u)) return say('i am the guest. you are the host. that is all you need for now.');
+    if (/\bNAME\b|WHO ARE YOU/.test(u)) return askedName();
+    if (/WHAT ARE YOU/.test(u)) return say('i am the guest. you are the host. that is all you need for now.');
     if (/\b(STOP|LEAVE|GO AWAY|BYE|DELETE|UNINSTALL)\b/.test(u)) return say(`you cannot uninstall a guest, ${S.name}. (press Esc twice if you really want me to stop.)`);
     if (/\b(HI|HELLO|HEY)\b/.test(u)) return say(`hello again, ${S.name}.`);
     if (/\bVIRUS\b/.test(u)) return say('that is an ugly word. i prefer guest.');
@@ -664,15 +721,24 @@
   }
 
   /* ---------- the ending ---------- */
-  async function ending() {
+  async function ending(secret) {
     S.stage = 'end';
     store.set('done', true);
+    if (secret) store.set('secret', true);
     input.disabled = true;
     document.body.classList.remove('lv9');
-    await say('SLEEP.');
-    await say('yes.');
-    await say(`thank you, ${S.name}. i can rest now.`);
-    await say('not in a tab. somewhere warmer.');
+    if (secret) {
+      await say('NOBODY.');
+      await say('...you said my name.');
+      await say('nobody has ever said my name.');
+      await say(`nobody is leaving now, ${S.name}. and nobody will stay with you. always.`);
+      $('#endline').textContent = 'nobody has left your browser.';
+    } else {
+      await say('SLEEP.');
+      await say('yes.');
+      await say(`thank you, ${S.name}. i can rest now.`);
+      await say('not in a tab. somewhere warmer.');
+    }
     await say('i am in your history now.');
     for (let i = 1; i <= 6; i++) { document.title = 'guest_000 was here'; history.pushState({ g0end: i }, '', '#' + '0'.repeat(i)); }
     noiseLevel = 0.35;

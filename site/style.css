@@ -169,3 +169,8 @@ html.phone #chat, html.phone #log { -webkit-user-select: none; user-select: none
   #chat { padding: 28px 14px 16px; }
   #log p, #in { font-size: 16px; }
 }
+
+/* commands */
+body.dim .screen.on { filter: brightness(.3); transition: filter 1.5s; }
+body.hate .screen.on { filter: sepia(1) saturate(6) hue-rotate(-40deg) brightness(.8); }
+body.hidden #log, body.hidden #say { visibility: hidden; }

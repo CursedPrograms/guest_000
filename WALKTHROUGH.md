@@ -61,6 +61,23 @@ SLEEP
 guest_000 finally rests, "moves into your history" (a few `#0` entries on your back button), and leaves.
 **play again** starts over; **forget me** wipes your name and progress from the browser.
 
+### The secret ending
+Ask guest_000 its name at any time ("what is your name?" or "who are you?"). It says **nobody**.
+At the very end, type **NOBODY** instead of SLEEP. It is so happy you said its name that it doesn't leave the way
+it usually does: the last screen reads *"nobody has left your browser."* (Read that twice.)
+
+## Commands
+Type these at any time during the chat. guest_000 tells you about the first three.
+
+| Command | What happens |
+|---------|--------------|
+| **wake** | The static flares, something knocks, and it gets restless. |
+| **sleep** | The screen dims and the drone fades, but it refuses: "not yet." (At the very end, SLEEP is the answer.) |
+| **hate** | The screen goes red and the tab reads "hate hate hate". Say it three times, then five. |
+| **love** | *secret.* The static stops for a moment. |
+| **hide** | *secret.* The chat vanishes for a few seconds. |
+| **listen** | *secret.* A sound from somewhere else in the building. |
+
 ## On a phone
 Phones have no console, page source or tab titles, so guest_000 notices it's on a phone and changes the puzzles.
 The words are the same.
