@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>guest_000</title>
+<link rel="icon" id="fav" href="data:,">
+<link rel="stylesheet" href="site/style.css">
+</head>
+<body>
+<!-- it is not up here. -->
+<canvas id="noise"></canvas>
+
+<div id="gate" class="screen on">
+  <div class="box">
+    <h1>guest_000</h1>
+    <p class="sub">a browser horror game</p>
+    <p id="gate-back" class="back"></p>
+    <p class="warn">This page will try to frighten you. It plays with your tab, your title bar, your sound and your fullscreen.
+      It is fiction: nothing is installed, nothing is sent anywhere, nothing leaves this page.</p>
+    <p class="warn">Flashing images and sudden loud sounds. Headphones make it worse.</p>
+    <p class="warn">Press <b>Esc</b> twice, or click <b>esc esc</b> in the corner, to stop at any time.</p>
+    <button id="enter">let it in</button>
+    <p class="credit"><a href="https://cursed-entertainment.itch.io/" target="_blank" rel="noopener">© Cursed Entertainment 2026</a></p>
+  </div>
+</div>
+
+<div id="term" class="screen"><pre id="termtext"></pre></div>
+
+<div id="chat" class="screen">
+  <div id="log"></div>
+  <form id="say" autocomplete="off">
+    <span class="prompt">&gt;</span>
+    <input id="in" spellcheck="false" maxlength="80" aria-label="talk to guest_000">
+  </form>
+  <!-- the third word is ROOT. it does not know i told you. -->
+  <p class="hush">the fourth word is HOME. hold it and it will show.</p>
+</div>
+
+<div id="end" class="screen">
+  <div class="box">
+    <h1>guest_000</h1>
+    <p>guest_000 has left your browser.</p>
+    <p class="warn">It was never really there. This was a game: nothing was installed, nothing was sent,
+      and the only thing kept is your name and your progress, in this browser's storage.</p>
+    <button id="again">play again</button>
+    <button id="forget">forget me</button>
+    <p class="credit"><a href="https://cursed-entertainment.itch.io/" target="_blank" rel="noopener">© Cursed Entertainment 2026</a></p>
+  </div>
+</div>
+
+<div id="face" aria-hidden="true">
+  <svg viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="100" cy="125" rx="78" ry="112" fill="#cfcac0"/>
+    <ellipse cx="100" cy="125" rx="78" ry="112" fill="none" stroke="#8a857c" stroke-width="2"/>
+    <ellipse cx="68" cy="105" rx="17" ry="24" fill="#000"/>
+    <ellipse cx="132" cy="105" rx="17" ry="24" fill="#000"/>
+    <path d="M60 127 q3 30 -2 58" stroke="#000" stroke-width="3" fill="none"/>
+    <path d="M136 127 q-2 22 3 44" stroke="#000" stroke-width="3" fill="none"/>
+    <circle cx="70" cy="108" r="2.5" fill="#b3001b"/>
+    <circle cx="130" cy="108" r="2.5" fill="#b3001b"/>
+    <path d="M48 180 q52 22 104 0 q-52 8 -104 0z" fill="#000"/>
+    <path d="M100 135 l-6 22 h12z" fill="#a39d92"/>
+  </svg>
+</div>
+<div id="flash"></div>
+
+<button id="stop" title="stop the game">esc esc</button>
+<div id="pause">
+  <div class="box">
+    <h1>paused</h1>
+    <p>It's just a web page. Nothing has touched your computer.</p>
+    <button id="resume">keep playing</button>
+    <button id="reset">start over</button>
+    <button id="leave">leave</button>
+  </div>
+</div>
+<!-- it is not down here either. -->
+<script src="site/site.js"></script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+# guest_000
+
+A browser horror game. Something has moved into your tab, and it is in pieces. Find its four words, hidden
+around your own browser, and say them back to it.
+
+**Play:** https://cursedprograms.github.io/guest_000/
+
+![guest_000](images/screenshot.png)
+
+It is **fiction**: nothing is installed and nothing is sent anywhere. The only thing kept is your name and your
+progress, in this browser's localStorage ("forget me" at the end wipes it). Press Esc twice, or the `esc esc` button
+in the corner, to stop at any time.
+
+> Flashing images and sudden loud sounds.
+
+## What it plays with
+- the tab title and favicon, which whisper while you are on another tab
+- fullscreen, the back button, the console, the page source, Ctrl+A selection, copy, print and resizing
+- reactions when you go idle or move toward the X, plus counting your time away and your visits
+- optional desktop notifications (asked in the game; they need http(s), not `file://`)
+- a Web Audio drone, typing clicks and stings, and canvas static
+
+## Run it locally
+Open `index.html`, or run `serve.bat` / `serve.sh` / `serve.ps1` and go to http://localhost:8666 (needed for
+notifications).
+
+<div align="center">
+  <img src="images/qr.png" alt="QR code to the guest_000 page" width="160">
+</div>
+
+---
+
+<div align="center">
+© Cursed Entertainment 2026
+</div>
+<br>
+<div align="center">
+<a href="https://cursed-entertainment.itch.io/" target="_blank">
+    <img src="https://github.com/CursedPrograms/cursedentertainment/raw/main/images/logos/logo-wide-grey.png"
+        alt="CursedEntertainment Logo" style="width:250px;">
+</a>
+</div>
