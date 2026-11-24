@@ -21,6 +21,8 @@ memory, battery, language, timezone and clock. Nothing is sent anywhere. Just wa
 
 ## 3. The chat
 guest_000 asks what to call you. Type a name and press Enter; it uses that name from then on.
+Then it asks you to rate its bunny game, one to five stars. Any answer is fine, but it remembers: one star makes it
+angry, five stars makes it very happy ("nobody has ever liked something i made"), and it brings it up at the end.
 It is in pieces: **four words** are hidden around your browser. Type each one back to it, **in order**.
 Type **hint** at any time for a clearer clue.
 

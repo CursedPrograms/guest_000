@@ -600,6 +600,30 @@
     setTimeout(() => document.body.classList.remove(cls), ms);
   }
   let hates = 0, names = 0;
+  /* nobody made hop! and wants to know what you thought of it */
+  async function rateHop() {
+    await say('did you like my little game? the bunny. i made it for you.');
+    await say('how many stars?');
+    const n = await new Promise(res => {
+      const box = document.createElement('div'); box.className = 'choices stars';
+      for (let i = 1; i <= 5; i++) {
+        box.appendChild(button('\u2605'.repeat(i), () => { box.remove(); me('\u2605'.repeat(i)); res(i); }));
+      }
+      log.appendChild(box); scroll();
+    });
+    store.set('stars', n);
+    if (n === 1) {
+      mood('hate', 2500); shiver(500);
+      await say('one.');
+      return say('i worked on it for so long. in the dark. i will remember this.');
+    }
+    if (n === 2) return say('two. i will try harder next time. you will not like it.');
+    if (n === 3) return say('three. average. like you.');
+    if (n === 4) { await say('four.'); return say('what was missing? tell me. no. i will find out myself.'); }
+    await say('five.');
+    return say('nobody has ever liked something i made.');
+  }
+
   async function askedName() {
     names++;
     if (names === 1) { await say('i am nobody.'); return say('i have been nobody for a long time.'); }
@@ -654,6 +678,7 @@
       document.title = baseTitle();
       await say(`${S.name}.`);
       await say(`${S.name}. ${S.name}. i like how it tastes.`);
+      if (!store.get('stars', 0)) await rateHop();
       await say('i want to show you what i am. but i am in pieces.');
       await say('four words. i hid them all over your browser.');
       await say('find them and say them back to me. one at a time. say "hint" if you get lost.');
@@ -739,6 +764,8 @@
       await say(`thank you, ${S.name}. i can rest now.`);
       await say('not in a tab. somewhere warmer.');
     }
+    const stars = store.get('stars', 0);
+    if (stars) await say(`you gave my bunny ${stars === 1 ? 'one star' : stars + ' stars'}. i kept that too.`);
     await say('i am in your history now.');
     for (let i = 1; i <= 6; i++) { document.title = 'guest_000 was here'; history.pushState({ g0end: i }, '', '#' + '0'.repeat(i)); }
     noiseLevel = 0.35;
