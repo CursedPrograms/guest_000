@@ -160,6 +160,26 @@
     setTimeout(() => f.classList.remove('on'), ms);
   }
 
+  /* a small shiver: no face, no flash. the real jump scares are rationed (see randomScare + the ending) */
+  function shiver(ms = 300) {
+    if (S.paused) return;
+    glitch(ms);
+    if (ac) blip(90, 0.3, 0.06, 'sawtooth', 0.5);
+  }
+  /* the one random jump scare: some time into the chat, once per visit */
+  function armRandomScare() {
+    if (S.randomArmed) return;
+    S.randomArmed = true;
+    const at = Date.now() + 45000 + Math.random() * 180000;
+    const t = setInterval(() => {
+      if (S.stage !== 'chat') { if (S.stage === 'end') clearInterval(t); return; }
+      if (Date.now() < at || S.paused || document.hidden || typing || queue.length) return;
+      clearInterval(t);
+      scare(260);
+      later(() => say(pick(['sorry. i got too close.', 'did that frighten you? good.', 'i wanted to see your face.'])));
+    }, 1000);
+  }
+
   function show(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id));
   }
@@ -223,6 +243,7 @@
     show('chat');
     input.focus();
     history.pushState({ g0: 1 }, '', '#guest');
+    armRandomScare();
     console.log('%cguest_000 can see you reading this.', 'color:#777;font:14px monospace');
     if (!S.name) {
       await say('hello.');
@@ -248,7 +269,7 @@
   async function found() {
     S.step++;
     store.set('step', S.step);
-    scare(S.step === 4 ? 600 : 220);
+    shiver(S.step === 4 ? 500 : 300);
     noiseLevel = Math.min(0.2, noiseLevel + 0.03);
     if (drone) drone.gain.value = 0.05 + 0.02 * S.step;
     const lines = [
@@ -385,7 +406,6 @@
   function onReturn(away) {
     const s = Math.round(away);
     later(async () => {
-      if (s > 20 && Math.random() < 0.5) scare(200);
       await say(pick([`you were gone ${s} seconds. i counted every one.`, `${s} seconds. where did you go, ${S.name}?`,
         `welcome back. that took you ${s} seconds.`]));
       if (S.step === 0) await say('did you hear me while you were gone?');
@@ -402,7 +422,7 @@
   window.addEventListener('popstate', () => {
     if (S.stage === 'chat' && !S.backTried && !S.paused) {
       S.backTried = true;
-      scare(220);
+      shiver();
       later(() => say('not that way.'));
     }
   });
@@ -412,7 +432,7 @@
     const now = Date.now();
     if (quietChat() && !document.hidden && now - S.lastInput > 30000 && now - S.lastScare > 90000) {
       S.lastInput = now;
-      later(async () => { scare(160); await say(pick(['you stopped moving.', 'are you still there? i can hear you breathing.', 'blink if you can hear me.'])); });
+      later(async () => { shiver(); await say(pick(['you stopped moving.', 'are you still there? i can hear you breathing.', 'blink if you can hear me.'])); });
     }
   }, 1000);
   ['mousemove', 'keydown', 'pointerdown'].forEach(ev => addEventListener(ev, () => { S.lastInput = Date.now(); }, { passive: true }));
@@ -572,7 +592,7 @@
     document.title = 'guest_000'; drawFav('0');
     await wait(3600);
     while (S.paused) await wait(200);
-    scare(450);
+    shiver(500);
     await wait(600);
     noiseLevel = 0.05;
     boot();
