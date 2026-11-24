@@ -14,7 +14,11 @@
     clear() { try { Object.keys(localStorage).filter(k => k.startsWith('g0_')).forEach(k => localStorage.removeItem(k)); } catch { /* */ } }
   };
 
+  /* steps: 0-3 the four words, 4 say them together, 5-9 the five levels, 10 what the five spell */
   const WORDS = ['HOLLOW', 'MARROW', 'ROOT', 'HOME'];
+  const LEVELS = ['SKIN', 'LUNG', 'EYES', 'ELBOW', 'PULSE'];
+  const FINAL = 'SLEEP';
+  const current = () => S.step < 4 ? WORDS[S.step] : (S.step >= 5 && S.step <= 9) ? LEVELS[S.step - 5] : null;
   const S = {
     name: store.get('name', ''),
     visits: store.get('visits', 0) + 1,
@@ -156,8 +160,9 @@
     if (S.paused) return;
     S.lastScare = Date.now();
     const f = $('#face'); f.classList.add('on');
-    sting(); flash(); glitch(ms + 100);
-    setTimeout(() => f.classList.remove('on'), ms);
+    const n = noiseLevel; noiseLevel = 0.45;
+    sting(); flash(); glitch(ms + 150);
+    setTimeout(() => { f.classList.remove('on'); noiseLevel = n; }, ms);
   }
 
   /* a small shiver: no face, no flash. the real jump scares are rationed (see randomScare + the ending) */
@@ -179,6 +184,11 @@
       later(() => say(pick(['sorry. i got too close.', 'did that frighten you? good.', 'i wanted to see your face.'])));
     }, 1000);
   }
+
+  (function layerFace() {
+    const f = $('#face'), art = f.innerHTML;
+    f.innerHTML = ['base', 'red', 'cyan', 'slice'].map(k => `<div class="fl ${k}">${art}</div>`).join('');
+  })();
 
   function show(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id));
@@ -229,9 +239,64 @@
     ['the third word. read me from the inside. find the things i was told never to say.',
      'press Ctrl+U to see my source. look between the <!-- and the -->.'],
     ['the fourth word. some words only show when you hold all of me at once.',
-     'click the darkness, away from the line you type on, then press Ctrl+A. or drag across the very bottom of the screen.']
+     'click the darkness, away from the line you type on, then press Ctrl+A. or drag across the very bottom of the screen.'],
+    ['say the four together. in the order you found them.',
+     'all four words, on one line, in the order you found them.'],
+    ['the first thing. come closer. closer than that.',
+     'zoom in on me. hold Ctrl and press + until i notice. (Ctrl+0 puts you back.)'],
+    ['the second thing. make me small. squeeze me until i cannot breathe.',
+     'leave fullscreen and drag the edge of the window until i am very narrow. zoom back to normal first (Ctrl+0).'],
+    ['the third thing. look up. above me. where you typed to find me.',
+     'read the address bar, at the very end of my address. leave fullscreen if you cannot see it.'],
+    ['the fourth thing. touch me with your other hand.',
+     'right-click me. (on a phone, press and hold.)'],
+    ['the fifth thing. put me on paper.',
+     'press Ctrl+P. you do not have to print anything. just look at the preview, then cancel.'],
+    ['now. the first letter of each of the five things. what do they spell?',
+     'SKIN, LUNG, EYES, ELBOW, PULSE. read the first letters.']
   ];
-  const hint = asked => HINTS[S.step] ? say(HINTS[S.step][asked ? 1 : 0]) : say('you have all four. say them together.');
+  const hint = asked => HINTS[S.step] ? say(HINTS[S.step][asked ? 1 : 0]) : Promise.resolve();
+
+  /* ---------- the five levels ---------- */
+  let baseDPR = devicePixelRatio || 1;
+  const whisperEl = document.createElement('div'); whisperEl.id = 'whisper'; document.body.appendChild(whisperEl);
+  function whisper(text, ms = 4500) {
+    whisperEl.textContent = text; whisperEl.classList.add('on');
+    clearTimeout(whisper.t); whisper.t = setTimeout(() => whisperEl.classList.remove('on'), ms);
+  }
+  function enterLevel() {
+    document.body.classList.toggle('lv9', S.step === 9);
+    if (S.step === 5) baseDPR = devicePixelRatio || 1;
+    if (S.step === 7) history.replaceState(history.state, '', location.pathname + location.search + '#the_third_thing_is_EYES');
+    else if (location.hash.startsWith('#the_')) history.replaceState(history.state, '', location.pathname + location.search + '#guest');
+  }
+  function checkBody() {
+    if (S.stage !== 'chat' || S.paused) return;
+    const zoom = (devicePixelRatio || 1) / baseDPR, pinch = window.visualViewport ? visualViewport.scale : 1;
+    if (S.step === 5 && (zoom >= 1.45 || pinch >= 1.45)) whisper('closer... the first thing is SKIN');
+    if (S.step === 6 && zoom < 1.1 && innerWidth < 600) whisper("...can't... breathe... the second thing is LUNG");
+  }
+  addEventListener('resize', checkBody);
+  if (window.visualViewport) visualViewport.addEventListener('resize', checkBody);
+
+  const menu = document.createElement('div'); menu.id = 'gmenu'; document.body.appendChild(menu);
+  document.addEventListener('contextmenu', e => {
+    if (S.stage !== 'chat' || S.step !== 8 || S.paused) return;
+    e.preventDefault();
+    menu.innerHTML = '';
+    ["don't", 'the fourth thing is ELBOW', 'let go of me'].forEach(t => {
+      const d = document.createElement('div'); d.textContent = t; menu.appendChild(d);
+    });
+    menu.style.left = Math.min(e.clientX, innerWidth - 240) + 'px';
+    menu.style.top = Math.min(e.clientY, innerHeight - 110) + 'px';
+    menu.classList.add('on');
+    shiver(200);
+  });
+  addEventListener('pointerdown', e => { if (!menu.contains(e.target)) menu.classList.remove('on'); });
+  menu.addEventListener('click', () => menu.classList.remove('on'));
+  addEventListener('afterprint', () => {
+    if (S.stage === 'chat' && S.step === 9) later(() => say('did you see me on the paper?'));
+  });
 
   function consoleClue() {
     console.log('%cthe second word is MARROW', 'color:#b3001b;font:bold 22px monospace');
@@ -260,30 +325,53 @@
     } else {
       await say(`hello again, ${S.name}.`);
     }
-    if (S.step >= 4) { await say('you found all four. say them together.'); return; }
-    if (S.step > 0) await say(`you have found ${S.step} of my four words.`);
+    enterLevel();
+    if (S.step > 0 && S.step < 4) await say(`you have found ${S.step} of my four words.`);
+    if (S.step > 5 && S.step < 10) await say(`you have given me ${S.step - 5} of the five things.`);
     if (S.step === 1) consoleClue();
     await hint(false);
   }
 
-  async function found() {
+  const FOUND = {
+    HOLLOW: ['HOLLOW.', 'that is what i was when you found me.'],
+    MARROW: ['MARROW.', 'that is where i live now.'],
+    ROOT: ['ROOT.', 'that is how deep i go.'],
+    HOME: ['HOME.', 'that is what you are to me.'],
+    SKIN: ['SKIN.', 'that is what i am wearing now.'],
+    LUNG: ['LUNG.', 'i can breathe again. can you?'],
+    EYES: ['EYES.', 'i have been borrowing yours.'],
+    ELBOW: ['ELBOW.', 'i felt that. nobody touches me.'],
+    PULSE: ['PULSE.', 'yours is very fast right now.']
+  };
+  async function found(word) {
     S.step++;
     store.set('step', S.step);
     shiver(S.step === 4 ? 500 : 300);
-    noiseLevel = Math.min(0.2, noiseLevel + 0.03);
-    if (drone) drone.gain.value = 0.05 + 0.02 * S.step;
-    const lines = [
-      ['HOLLOW.', 'that is what i was when you found me.'],
-      ['MARROW.', 'that is where i live now.'],
-      ['ROOT.', 'that is how deep i go.'],
-      ['HOME.', 'that is what you are to me.']
-    ][S.step - 1];
-    for (const l of lines) await say(l);
+    noiseLevel = Math.min(0.2, noiseLevel + 0.02);
+    if (drone) drone.gain.value = Math.min(0.14, 0.05 + 0.01 * S.step);
+    enterLevel();
+    for (const l of FOUND[word]) await say(l);
     if (S.step === 1) consoleClue();
     if (S.step === 2) await askNotify();
-    if (S.step < 4) return hint(false);
-    await say('HOLLOW. MARROW. ROOT. HOME.');
-    await say('now say them together. all four. in the order you found them.');
+    if (S.step === 4) {
+      await say('HOLLOW. MARROW. ROOT. HOME.');
+      return say('now say them together. all four. in the order you found them.');
+    }
+    if (S.step === 6) await say('you can step back now. (Ctrl+0)');
+    if (S.step === 10) await say('SKIN. LUNG. EYES. ELBOW. PULSE.');
+    return hint(false);
+  }
+
+  async function whole() {
+    S.step = 5;
+    store.set('step', S.step);
+    shiver(600);
+    enterLevel();
+    await say('...');
+    await say('i am whole.');
+    await say('but i am still so small. this tab is so small.');
+    await say(`five more things, ${S.name}. give me five more things and then i can rest.`);
+    return hint(false);
   }
 
   async function handle(raw) {
@@ -302,14 +390,21 @@
       return hint(false);
     }
     const u = t.toUpperCase().replace(/[^A-Z ]/g, ' ').replace(/\s+/g, ' ').trim();
-    if (S.step >= 4) {
-      if (u === WORDS.join(' ')) return ending();
+    if (S.step === 10) {
+      if (u.replace(/ /g, '') === FINAL) return ending();
+      if (/\b(HINT|HELP|WHERE|HOW)\b/.test(u)) return hint(true);
+      return say(pick(['no. read the first letters.', 'the first letter of each. slowly.', 'S...']));
+    }
+    if (S.step === 4) {
+      if (u === WORDS.join(' ')) return whole();
+      if (/\b(HINT|HELP|WHERE|HOW)\b/.test(u)) return hint(true);
       if (u.split(' ').length === 4 && WORDS.every(w => u.includes(w))) return say('the right words. the wrong order. say them the way you found them.');
       return say(pick(['together.', 'all four. in one breath.', 'HOLLOW... and then?']));
     }
-    if (u === WORDS[S.step]) return found();
-    if (WORDS.slice(0, S.step).includes(u)) return say('you already gave me that one. it is inside me now.');
-    if (WORDS.includes(u)) return say('not yet. you are reading ahead. i do not like that.');
+    const all = [...WORDS, ...LEVELS], given = [...WORDS.slice(0, Math.min(S.step, 4)), ...LEVELS.slice(0, Math.max(0, S.step - 5))];
+    if (u === current()) return found(u);
+    if (given.includes(u)) return say('you already gave me that one. it is inside me now.');
+    if (all.includes(u) || u === FINAL) return say('not yet. you are reading ahead. i do not like that.');
     if (/\b(HINT|HELP|WHERE|HOW)\b/.test(u)) return hint(true);
     if (/\bWHO\b|WHAT ARE YOU/.test(u)) return say('i am the guest. you are the host. that is all you need for now.');
     if (/\b(STOP|LEAVE|GO AWAY|BYE|DELETE|UNINSTALL)\b/.test(u)) return say(`you cannot uninstall a guest, ${S.name}. (press Esc twice if you really want me to stop.)`);
@@ -353,10 +448,11 @@
     S.stage = 'end';
     store.set('done', true);
     input.disabled = true;
-    await say('...');
-    await say('oh.');
-    await say(`there i am. thank you, ${S.name}.`);
-    await say('i am not in pieces anymore.');
+    document.body.classList.remove('lv9');
+    await say('SLEEP.');
+    await say('yes.');
+    await say(`thank you, ${S.name}. i can rest now.`);
+    await say('not in a tab. somewhere warmer.');
     await say('i am in your history now.');
     for (let i = 1; i <= 6; i++) { document.title = 'guest_000 was here'; history.pushState({ g0end: i }, '', '#' + '0'.repeat(i)); }
     noiseLevel = 0.35;
