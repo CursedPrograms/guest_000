@@ -101,3 +101,18 @@ body.glitch #log p { text-shadow: 2px 0 var(--red), -2px 0 #0aa; }
   body > * { display: none !important; }
   body::after { content: "you can't take me with you on paper."; display: block; color: #000; font: 24px monospace; padding: 40px; }
 }
+
+/* the "404" page with hop! on it */
+#run {
+  flex-direction: column; align-items: center; justify-content: center; padding: 24px;
+  background: #fafafa; color: #555; font-family: system-ui, "Segoe UI", Arial, sans-serif;
+}
+.e404 { margin: 0; font-size: 72px; font-weight: 300; color: #333; letter-spacing: .05em; }
+.e404-sub { margin: 0 0 12px; font-size: 20px; color: #777; }
+#run .small { margin: 10px 0; font-size: 14px; color: #888; text-align: center; }
+#run .fine { font-size: 11px; color: #aaa; margin-top: 18px; }
+#run .fine a { color: #aaa; }
+#hop {
+  width: min(94vw, 900px); aspect-ratio: 640 / 200; image-rendering: pixelated;
+  border: 1px solid #e2e2e2; cursor: pointer; touch-action: manipulation;
+}

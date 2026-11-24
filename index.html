@@ -3,26 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>guest_000</title>
+<title>404 Not Found</title>
 <link rel="icon" id="fav" href="data:,">
 <link rel="stylesheet" href="site/style.css">
 </head>
 <body>
+<!-- reading this before the game asked you to? close it and go play first. it is better that way. -->
 <!-- it is not up here. -->
 <canvas id="noise"></canvas>
 
-<div id="gate" class="screen on">
-  <div class="box">
-    <h1>guest_000</h1>
-    <p class="sub">a browser horror game</p>
-    <p id="gate-back" class="back"></p>
-    <p class="warn">This page will try to frighten you. It plays with your tab, your title bar, your sound and your fullscreen.
-      It is fiction: nothing is installed, nothing is sent anywhere, nothing leaves this page.</p>
-    <p class="warn">Flashing images and sudden loud sounds. Headphones make it worse.</p>
-    <p class="warn">Press <b>Esc</b> twice, or click <b>esc esc</b> in the corner, to stop at any time.</p>
-    <button id="enter">let it in</button>
-    <p class="credit"><a href="https://cursed-entertainment.itch.io/" target="_blank" rel="noopener">© Cursed Entertainment 2026</a></p>
-  </div>
+<div id="run" class="screen on">
+  <h1 class="e404">404</h1>
+  <p class="e404-sub">Not Found</p>
+  <p class="small">The page you were looking for isn't here. While you're here, hop over some rocks.</p>
+  <canvas id="hop" aria-label="hop! a little runner game"></canvas>
+  <p class="small">space, up arrow or tap to hop.</p>
+  <p class="small fine">contains flashing images and sudden loud sounds &middot; press Esc twice to stop &middot;
+    <a href="https://cursed-entertainment.itch.io/" target="_blank" rel="noopener">© Cursed Entertainment 2026</a></p>
 </div>
 
 <div id="term" class="screen"><pre id="termtext"></pre></div>
@@ -76,6 +73,7 @@
   </div>
 </div>
 <!-- it is not down here either. -->
+<script src="site/runner.js"></script>
 <script src="site/site.js"></script>
 </body>
 </html>

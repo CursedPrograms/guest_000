@@ -1,4 +1,5 @@
-/* guest_000 - a browser horror game. Nothing here leaves the page. */
+/* guest_000 - a browser horror game. Nothing here leaves the page.
+   Reading this before you've played? Stop here and go play it first: the code spoils every surprise. */
 (() => {
   'use strict';
   const $ = s => document.querySelector(s);
@@ -18,7 +19,7 @@
     name: store.get('name', ''),
     visits: store.get('visits', 0) + 1,
     step: store.get('done', false) ? 0 : store.get('step', 0),
-    stage: 'gate',
+    stage: 'run',
     expect: null,
     paused: false,
     hiddenAt: 0,
@@ -55,14 +56,13 @@
     fav.href = fc.toDataURL();
     return fav.href;
   }
-  drawFav('0');
   const baseTitle = () => (S.stage === 'chat' && S.name) ? `guest_000 — ${S.name}` : 'guest_000';
 
   /* ---------- static ---------- */
   const nc = $('#noise'), nx = nc.getContext('2d');
   nc.width = 160; nc.height = 90;
   const img = nx.createImageData(160, 90);
-  let noiseLevel = 0.05;
+  let noiseLevel = 0;
   (function noise() {
     const d = img.data;
     for (let i = 0; i < d.length; i += 4) { const v = Math.random() * 255 | 0; d[i] = d[i + 1] = d[i + 2] = v; d[i + 3] = 255; }
@@ -72,7 +72,7 @@
   })();
 
   /* ---------- sound ---------- */
-  let ac = null, master = null, drone = null, tickBuf = null;
+  let ac = null, master = null, drone = null, windGain = null, tickBuf = null;
   function noiseBuffer(sec) {
     const b = ac.createBuffer(1, Math.ceil(ac.sampleRate * sec), ac.sampleRate);
     const d = b.getChannelData(0);
@@ -83,14 +83,47 @@
     if (ac) return;
     try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch { return; }
     master = ac.createGain(); master.gain.value = 0.6; master.connect(ac.destination);
-    drone = ac.createGain(); drone.gain.value = 0.05; drone.connect(master);
+    drone = ac.createGain(); drone.gain.value = 0; drone.connect(master);
     [55, 55.6, 82.4].forEach(f => { const o = ac.createOscillator(); o.frequency.value = f; o.connect(drone); o.start(); });
     const wind = ac.createBufferSource(); wind.buffer = noiseBuffer(3); wind.loop = true;
     const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 380;
-    const wg = ac.createGain(); wg.gain.value = 0.05;
-    wind.connect(lp).connect(wg).connect(master); wind.start();
+    windGain = ac.createGain(); windGain.gain.value = 0;
+    wind.connect(lp).connect(windGain).connect(master); wind.start();
     tickBuf = noiseBuffer(0.03);
   }
+  function droneIn() {
+    if (!ac) return;
+    const t = ac.currentTime;
+    drone.gain.setTargetAtTime(0.05 + 0.02 * S.step, t, 0.8);
+    windGain.gain.setTargetAtTime(0.05, t, 0.8);
+  }
+  function blip(freq, dur, vol = 0.04, type = 'square', slide = 0) {
+    if (!ac || S.paused) return;
+    const t = ac.currentTime, osc = ac.createOscillator(), g = ac.createGain();
+    osc.type = type; osc.frequency.setValueAtTime(freq, t);
+    if (slide) osc.frequency.exponentialRampToValueAtTime(freq * slide, t + dur);
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    osc.connect(g).connect(master); osc.start(t); osc.stop(t + dur + 0.02);
+  }
+  /* hop!'s happy little tune, which goes wrong as the score climbs */
+  const TUNE = [72, 76, 79, 84, 79, 76, 74, 77, 81, 86, 81, 77, 76, 79, 83, 88, 83, 79, 77, 74];
+  let tuneOn = false, tuneI = 0, rot = 0;
+  function tuneStart() {
+    if (tuneOn || !ac) return;
+    tuneOn = true;
+    (function note() {
+      if (!tuneOn) return;
+      if (!S.paused) {
+        let n = TUNE[tuneI++ % TUNE.length];
+        if (rot > 0.5 && Math.random() < rot * 0.5) n -= 1 + Math.floor(Math.random() * 2);
+        const f = 440 * Math.pow(2, (n - 69) / 12) * Math.pow(2, -rot * 0.6);
+        blip(f, 0.12 + rot * 0.25, 0.035, rot > 0.7 ? 'sawtooth' : 'square');
+      }
+      setTimeout(note, 150 + rot * 260);
+    })();
+  }
+  const tuneStop = () => { tuneOn = false; };
+
   function tick() {
     if (!ac || S.paused) return;
     const t = ac.currentTime, s = ac.createBufferSource(); s.buffer = tickBuf;
@@ -183,7 +216,6 @@
   function consoleClue() {
     console.log('%cthe second word is MARROW', 'color:#b3001b;font:bold 22px monospace');
   }
-  console.log('%cguest_000 can see you reading this.', 'color:#777;font:14px monospace');
   setInterval(() => { if (S.stage === 'chat' && S.step === 1) consoleClue(); }, 15000);
 
   async function chatStart() {
@@ -191,6 +223,7 @@
     show('chat');
     input.focus();
     history.pushState({ g0: 1 }, '', '#guest');
+    console.log('%cguest_000 can see you reading this.', 'color:#777;font:14px monospace');
     if (!S.name) {
       await say('hello.');
       await say('thank you for letting me in.');
@@ -436,8 +469,7 @@
     S.paused = true; S.stage = 'left'; clearInterval(whisperT);
     if (ac) ac.close(); document.body.innerHTML = '<p style="padding:40px;color:#888;font:16px monospace">You can close this tab now. Nothing stays behind.</p>'; document.title = 'closed'; };
 
-  /* ---------- gate + install ---------- */
-  if (S.name && S.visits > 1) $('#gate-back').textContent = `welcome back, ${S.name}. this is visit ${S.visits}.`;
+  /* ---------- install ---------- */
 
   async function gather() {
     const n = navigator;
@@ -507,10 +539,42 @@
     later(chatStart);
   }
 
-  $('#enter').addEventListener('click', () => {
-    audioOn();
+  /* ---------- the 404 page and hop! ---------- */
+  Hop($('#hop'), {
+    active: () => S.stage === 'run',
+    paused: () => S.paused,
+    // a returning player who already met guest_000 does not get to run for long
+    target: () => (S.name && S.visits > 1) ? 15 : 50,
+    onStart: () => { audioOn(); if (ac && ac.state === 'suspended') ac.resume(); tuneStart(); },
+    onCorrupt: c => {
+      rot = c;
+      noiseLevel = c * 0.04;
+      if (c > 0.6 && document.title === '404 Not Found' && Math.random() < 0.01) {
+        document.title = '404 N0t F0und';
+        setTimeout(() => { if (S.stage === 'run') document.title = '404 Not Found'; }, 400);
+      }
+    },
+    onDone: turn,
+    sfx: k => {
+      if (k === 'jump') blip(520, 0.12, 0.03, 'square', 1.8);
+      else if (k === 'hit') blip(180, 0.25, 0.05, 'square', 0.4);
+    }
+  });
+
+  async function turn() {
     const fs = document.documentElement.requestFullscreen;
     if (fs) document.documentElement.requestFullscreen().catch(() => { /* fine without */ });
+    tuneStop();
+    S.stage = 'turn';
+    noiseLevel = 0.08;
+    await wait(700);
+    droneIn();
+    document.title = 'guest_000'; drawFav('0');
+    await wait(3600);
+    while (S.paused) await wait(200);
+    scare(450);
+    await wait(600);
+    noiseLevel = 0.05;
     boot();
-  });
+  }
 })();

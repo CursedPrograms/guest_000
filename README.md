@@ -1,24 +1,18 @@
 # guest_000
 
-A browser horror game. Something has moved into your tab, and it is in pieces. Find its four words, hidden
-around your own browser, and say them back to it.
+A browser horror game. It starts somewhere innocent.
 
 **Play:** https://cursedprograms.github.io/guest_000/
+
+> **Play it first. Don't read the code before you have.** The source spoils every surprise, and the game will ask you
+> to look at certain things when it's time. Stuck? There's a [walkthrough](WALKTHROUGH.md) (spoilers).
 
 ![guest_000](images/screenshot.png)
 
 It is **fiction**: nothing is installed and nothing is sent anywhere. The only thing kept is your name and your
-progress, in this browser's localStorage ("forget me" at the end wipes it). Press Esc twice, or the `esc esc` button
-in the corner, to stop at any time.
+progress, in this browser's localStorage. Press Esc twice, or the `esc esc` button in the corner, to stop at any time.
 
-> Flashing images and sudden loud sounds.
-
-## What it plays with
-- the tab title and favicon, which whisper while you are on another tab
-- fullscreen, the back button, the console, the page source, Ctrl+A selection, copy, print and resizing
-- reactions when you go idle or move toward the X, plus counting your time away and your visits
-- optional desktop notifications (asked in the game; they need http(s), not `file://`)
-- a Web Audio drone, typing clicks and stings, and canvas static
+> Flashing images and sudden loud sounds. Headphones make it worse.
 
 ## Run it locally
 Open `index.html`, or run `serve.bat` / `serve.sh` / `serve.ps1` and go to http://localhost:8666 (needed for
