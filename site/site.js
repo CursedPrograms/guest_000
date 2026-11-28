@@ -259,9 +259,23 @@
     document.body.classList.add('glitch');
     setTimeout(() => document.body.classList.remove('glitch'), ms);
   }
+  /* the monsters: one picked at random for each scare; the drawn face stands in until they've loaded */
+  const MONSTERS = [1, 2, 3, 4].map(n => `images/monsters/monster${n}.jpg`);
+  const loadedMonsters = [];
+  MONSTERS.forEach(src => { const im = new Image(); im.onload = () => loadedMonsters.push(src); im.src = src; });
+  let lastMonster = null;
+  function dressFace() {
+    const f = $('#face');
+    if (!loadedMonsters.length) { f.querySelectorAll('.fl').forEach(l => { l.innerHTML = faceArt; }); return; }
+    const pool = loadedMonsters.length > 1 ? loadedMonsters.filter(m => m !== lastMonster) : loadedMonsters;
+    const src = lastMonster = pool[Math.floor(Math.random() * pool.length)];
+    f.querySelectorAll('.fl').forEach(l => { l.innerHTML = `<img src="${src}" alt="">`; });
+  }
+
   function scare(ms = 180) {
     if (S.paused) return;
     S.lastScare = Date.now();
+    dressFace();
     const f = $('#face'); f.classList.add('on');
     const n = noiseLevel; noiseLevel = 0.45;
     sting(); flash(); glitch(ms + 150);
@@ -288,8 +302,9 @@
     }, 1000);
   }
 
+  var faceArt;
   (function layerFace() {
-    const f = $('#face'), art = f.innerHTML;
+    const f = $('#face'), art = faceArt = f.innerHTML;
     f.innerHTML = ['base', 'red', 'cyan', 'slice'].map(k => `<div class="fl ${k}">${art}</div>`).join('');
   })();
 
@@ -770,6 +785,7 @@
     for (let i = 1; i <= 6; i++) { document.title = 'guest_000 was here'; history.pushState({ g0end: i }, '', '#' + '0'.repeat(i)); }
     noiseLevel = 0.35;
     if (drone) drone.gain.value = 0.16;
+    dressFace();
     $('#face').classList.add('on');
     sting(); flash(); glitch(500);
     await wait(450); sting(); glitch(500);

@@ -1,7 +1,8 @@
 # guest_000 TODO
 
-- [ ] **Monster jump scares**: Kimmie generates the monster pictures in Gemini and drops them in `images/monsters/`.
-      Then: link them in, so each scare picks a random monster (the SVG face stays as the fallback).
+- [x] **Monster jump scares**: four monsters in `images/monsters/` (web-sized from Kimmie's originals); each scare,
+      the ending's included, picks a random one (never the same twice running) and fills the screen through the glitch
+      layers. The SVG face stays as the fallback until they load. `images/cover.jpg` is the cover, for the README/preview.
 - [ ] **Webcam scare**: guest_000 asks to "see you" (the browser's own camera prompt, so it's opt-in; "no" just
       makes it sulk). If allowed, show the player's live face, glitched, with "i can see you" and one of the
       monsters appearing behind their shoulder, then a jump scare. The feed stays in the page: never recorded or
